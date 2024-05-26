@@ -11,6 +11,7 @@ LIST=~/.todo/list.txt
 
 
 # [ Initializing Folders && Files ]
+mkdir -vp $TODODIR
 mkdir -vp $TODOARCHIVE
 if [ ! -f $LIST ]; then touch $LIST; fi
 
@@ -43,8 +44,9 @@ function printlist(){
 # =================== #
 ## [ Main Function ] ##
 # =================== #
-
+#	Print current list if no argument is given.
 if (( $# < 1 )); then printlist && exit 0 || exit 1; fi
+#	Print help
 if [[ $1 == help ]]; then Help && exit 0 || exit 1; fi
 NOTES=${*:1}
 while getopts "ADlr:" opt; do
@@ -54,22 +56,28 @@ while getopts "ADlr:" opt; do
 			if (($# < 3)); then echo 'Usage for Archiving: "todo -S filename"'; fi
 			DATE=$(date "+%y%m%d__%A")
 			cp $LIST "$TODOARCHIVE/$DATE{_$2}"
+			exit 0
 			;; 
 
 		D) 			
 			DATE=$(date "+%y%m%d__%A")
-			DAILYLIST=~/.todo_day_$DATE
-			touch "$DAILYLIST"
+			DAILYLIST=~/.todo/Dailylist_$DATE
+			touch "${TODO}/${DAILYLIST}" && echo "Created ${TODO}${DAILYLIST}"
+			exit 0
 			;;
 		
 		r)		
-			L=$2
-			#if [[ ! $# > 1 ]]; then echo '! Please specify lines to remove' && exit 1; fi
-			echo "$L"
-			sed -i 'd'"$2" $LIST
+			# if (( $# < 2)); then echo "Usage: todo -r #LINETOREMOVE" && exit 1; fi
+			export N=$1
+			DELETE="${1##*r}"
+			echo "$DELETE"
+			sed -i "${DELETE}d" "$LIST"
+			exit 0
 			;;
 		*)	
-	 esac
+			Help
+			exit 1
+	esac
 done
 
 # Default if no parameter is given is to add whatever comes after "todo" in terminal
