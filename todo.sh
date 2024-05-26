@@ -72,11 +72,11 @@ while getopts "ADlr:" opt; do
 			# if (( $# < 2)); then echo "Usage: todo -r #LINETOREMOVE" && exit 1; fi
 			export N=$1
 			DELETE="${1##*r}"
-			echo "$DELETE"
+			# echo "$DELETE"
 			sed -i "${DELETE}d" "$LIST"
 
 			if (( $# > 1 )); then
-				for row in $(echo ${@:2}); do
+				for row in "${@:2}"; do
 					sed -i "${row}d" "$LIST"
 				done
 			fi
