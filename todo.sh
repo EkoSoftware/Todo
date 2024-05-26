@@ -24,10 +24,15 @@ echo '
 [ Todo ]
 Description: A Simple program for taking notes.
 Usage: todo [parameters] [notes]
-	-l		:Print List
-	-r #	:Remove Task with number # 
-	-A    :Archive the current list with and Saves it to ~/.todo/archive
-	-D    :Initialize a todo-list specifically for Today.
+	-l	: 	Print List
+	-r#	: 	Remove Task with number #
+			* Can remove any number of tasks after "-r#":
+				Example: 
+				"todo -r1 3 6 8"
+				Will delete lines 1, 3, 6 and 8
+
+	-A	: 	Archive the current list with and Saves it to ~/.todo/archive
+	-D  : 	Initialize a todo-list specifically for Today.
 '
 }
 #----------------------------------------------------
@@ -39,7 +44,7 @@ function printlist(){
 			((COUNT+=1))
 	done < $LIST
 }
-
+"${TODOARCHIVE}/${DATE}"
 
 # =================== #
 ## [ Main Function ] ##
@@ -51,28 +56,28 @@ if [[ $1 == help ]]; then Help && exit 0 || exit 1; fi
 
 #	No
 NOTES=${*:1}
+DATE=$(date "+%y%m%d__%A")
+
 while getopts "ADlr:" opt; do
 	case "$opt" in
 
 		A) 
-			if (($# < 3)); then echo 'Usage for Archiving: "todo -S filename"'; fi
-			DATE=$(date "+%y%m%d__%A")
-			cp $LIST "$TODOARCHIVE/$DATE{_$2}"
+			echo "Archiving current list"
+			cp -iv $LIST "${TODOARCHIVE}/${DATE}"
 			exit 0
 			;; 
 
 		D) 			
-			DATE=$(date "+%y%m%d__%A")
 			DAILYLIST=~/.todo/Dailylist_$DATE
-			touch "${TODO}/${DAILYLIST}" && echo "Created ${TODO}${DAILYLIST}"
+			cp -iv "$LIST" "${DAILYLIST}" && \
+				echo "Created ${TODO}${DAILYLIST}"
 			exit 0
 			;;
 		
 		r)		
-			# if (( $# < 2)); then echo "Usage: todo -r #LINETOREMOVE" && exit 1; fi
 			export N=$1
 			DELETE="${1##*r}"
-			# echo "$DELETE"
+			if [[ "$DELETE" == "" ]]; then echo "Usage: todo -r#LINETOREMOVE Optionalline Optionalline Optionalline..." && exit 1; fi
 			sed -i "${DELETE}d" "$LIST"
 
 			if (( $# > 1 )); then
