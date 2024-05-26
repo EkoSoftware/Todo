@@ -48,6 +48,8 @@ function printlist(){
 if (( $# < 1 )); then printlist && exit 0 || exit 1; fi
 #	Print help
 if [[ $1 == help ]]; then Help && exit 0 || exit 1; fi
+
+#	No
 NOTES=${*:1}
 while getopts "ADlr:" opt; do
 	case "$opt" in
@@ -72,6 +74,12 @@ while getopts "ADlr:" opt; do
 			DELETE="${1##*r}"
 			echo "$DELETE"
 			sed -i "${DELETE}d" "$LIST"
+
+			if (( $# > 1 )); then
+				for row in $(echo ${@:2}); do
+					sed -i "${row}d" "$LIST"
+				done
+			fi
 			exit 0
 			;;
 		*)	
