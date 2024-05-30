@@ -38,13 +38,14 @@ Usage: todo [parameters] [notes]
 #----------------------------------------------------
 function printlist(){
 	COUNT=1
+	# if [[ ]]
 	while IFS= read -r line
 	do
 			echo "[$COUNT] $line"
 			((COUNT+=1))
 	done < $LIST
 }
-"${TODOARCHIVE}/${DATE}"
+# "${TODOARCHIVE}/${DATE}"
 
 # =================== #
 ## [ Main Function ] ##
@@ -58,7 +59,7 @@ if [[ $1 == help ]]; then Help && exit 0 || exit 1; fi
 NOTES=${*:1}
 DATE=$(date "+%y%m%d__%A")
 
-while getopts "ADlr:" opt; do
+while getopts "Acxr:" opt; do
 	case "$opt" in
 
 		A) 
@@ -67,13 +68,17 @@ while getopts "ADlr:" opt; do
 			exit 0
 			;; 
 
-		D) 			
-			DAILYLIST=~/.todo/Dailylist_$DATE
-			cp -iv "$LIST" "${DAILYLIST}" && \
-				echo "Created ${TODO}${DAILYLIST}"
+		c) 			
+			cat $LIST | xclip -sel clip
+			echo "Contents of $LIST copied to clipboard!"
 			exit 0
 			;;
-		
+
+		x)
+			rm -f $LIST
+			touch $LIST
+			exit 0
+			;;
 		r)		
 			export N=$1
 			DELETE="${1##*r}"
